@@ -25,9 +25,11 @@
     "dotenv": "^16.4.5",
     "joi": "^17.13.3",
     "mongoose": "^8.4.4",
+    "mongoose-unique-validator": "^5.0.1",
     "pm2": "^5.4.1",
     "qs": "^6.12.1",
-    "underscore": "^1.13.6"
+    "underscore": "^1.13.6",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
   },
   "devDependencies": {
     "eslint": "^8.53.0",
