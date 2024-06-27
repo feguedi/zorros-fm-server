@@ -27,57 +27,9 @@ exports.jwtTokenStrategy = {
   },
 };
 
-exports.hapiNowAuth = {
-  verifyJWT: true,
-  keychain: [process.env.SECRET_KEY],
-  validate: async (request, token, h) => {
-    /**
-     * we asked the plugin to verify the JWT
-     * we will get back the decodedJWT as token.decodedJWT
-     * and we will get the JWT as token.token
-     */
-
-    const { id: usuarioId, sesion_id } = token.decodedJWT;
-
-    /**
-     * return the decodedJWT to take advantage of hapi's
-     * route authentication options
-     * https://hapijs.com/api#authentication-options
-     */
-
-    /**
-     * Validate your token here
-     */
-
-    const usuario = await Usuario.findById(usuarioId);
-    // const sesion = await Sesion.findById(sesion_id, 'usuario activo dispositivo')
-    // TODO: agregar un validador de dispositivo
-
-    // if (!sesion.activo || usuario._id !== sesion.usuario) {
-    //     return { isValid: false, credentials: null }
-    // }
-
-    if (!usuario || !usuario.activo) {
-      return { isValid: false, credentials: null };
-    }
-
-    return { isValid: true, credentials: token.decodedJWT };
-  },
-};
-
-exports.nowAdminAuth = {
-  verifyJWT: true,
-  keychain: [process.env.SECRET_KEY],
-  validate: async (request, token, h) => {
-    return usuarioValido(token.decodedJWT);
-  },
-};
-
 exports.nuevoUsuario = async (request, usr, contrasenia) => {
   try {
-    const emailRegex =
-      /^([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x22([^\x0d\x22\x5c\x80-\xff]|\x5c[\x00-\x7f])*\x22))*\x40([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d)(\x2e([^\x00-\x20\x22\x28\x29\x2c\x2e\x3a-\x3c\x3e\x40\x5b-\x5d\x7f-\xff]+|\x5b([^\x0d\x5b-\x5d\x80-\xff]|\x5c[\x00-\x7f])*\x5d))*$/g;
-    const credencial = emailRegex.test(usr) ? { correoElectronico: usr } : { nickname: usr };
+    const credencial = { nickname: usr };
     const usuario = await Usuario.findOne(credencial);
     const isValid = await bcrypt.compare(contrasenia, usuario.contrasenia);
 
@@ -88,7 +40,7 @@ exports.nuevoUsuario = async (request, usr, contrasenia) => {
       return { isValid: false, credentials: null, message: 'Usuario no válido' };
     }
 
-    const credentials = _.pick(usuario, ['nombres', 'apellidos', 'telefono', 'correoElectronico', 'rol', 'sucursal']);
+    const credentials = _.pick(usuario, ['nombre', 'telefono', 'imagen', 'rol', 'sucursal']);
     credentials.id = usuario._id;
 
     return { isValid, credentials };
@@ -110,12 +62,3 @@ exports.cookieSession = {
     return usuarioValido(session);
   },
 };
-
-exports.googleCredentials = (uri) => ({
-  provider: 'google',
-  password: process.env.COOKIES_KEY,
-  isSecure: process.env.NODE_ENV === 'production',
-  clientId: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_SECRET_ID,
-  location: uri,
-});
