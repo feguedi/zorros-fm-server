@@ -8,7 +8,7 @@ exports.verificarPrimerAdmin = async function () {
 
     if (!administradores || administradores.length === 0) {
       const datosAdmin = {
-        nombres: process.env.FIRST_ADMIN_USER,
+        nombre: process.env.FIRST_ADMIN_USER,
         nickname: process.env.FIRST_ADMIN_NICK,
         contrasenia: process.env.FIRST_ADMIN_PASS,
         telefono: process.env.FIRST_ADMIN_PHONE,
