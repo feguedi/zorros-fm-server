@@ -51,9 +51,9 @@ exports.nuevoUsuario = async (request, usr, contrasenia) => {
 
 exports.cookieSession = {
   cookie: {
-    name: 'DUSANTSESSION',
+    name: 'ZORROSSESSION',
     password: process.env.COOKIES_KEY,
-    path: '/dusant',
+    path: '/zorros',
     // ttl: Date.now() + (1000 * 60 * 60 * 24 * 7),
     isSecure: process.env.NODE_ENV === 'production',
   },

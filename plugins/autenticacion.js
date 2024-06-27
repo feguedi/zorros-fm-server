@@ -2,7 +2,7 @@ const { jwtTokenStrategy, cookieSession } = require('../utils/strategies');
 
 const authPlugin = {
   plugin: {
-    name: 'dusant-autenticacion',
+    name: 'zorros-autenticacion',
     version: '1.0.0',
     register(server) {
       server.auth.strategy('token', 'jwt', jwtTokenStrategy);
