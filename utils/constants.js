@@ -1,0 +1,1 @@
+exports.apiPrefix = 'api';
