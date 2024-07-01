@@ -8,16 +8,16 @@ const { generateToken } = require('../utils/auth');
 
 exports.login = async function (req) {
   try {
-    const { telefono, contrasenia } = req.payload;
+    const { usuario, contrasenia } = req.payload;
     const selector = ['id', 'nombre', 'contrasenia', 'telefono', 'nickname', 'rol'];
 
-    const isNumber = !Number.isNaN(telefono);
+    const isNumber = !Number.isNaN(usuario);
 
     if (!isNumber) {
       throw Boom.badRequest('Datos mal enviados');
     }
 
-    const usuarioValido = await Usuario.findOne({ telefono }, [...selector, 'activo', 'nuevo', 'createdAt'].join(' '));
+    const usuarioValido = await Usuario.findOne({ telefono: usuario }, [...selector, 'activo', 'nuevo', 'createdAt'].join(' '));
 
     if (!usuarioValido) {
       throw Boom.badRequest('Usuario no válido');
