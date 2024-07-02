@@ -1,4 +1,4 @@
-const { listarVideos } = require('../controllers');
+const { listarVideos, subirVideo } = require('../controllers');
 const { apiPrefix } = require('../utils/constants');
 const route = require('../utils/route');
 
@@ -27,6 +27,9 @@ module.exports = [
       output: 'stream',
       parse: true,
       allow: 'multipart/form-data',
+    },
+    func(req, h) {
+      return subirVideo(req, h);
     },
   }),
 ];
