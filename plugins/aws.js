@@ -1,4 +1,4 @@
-const { createClient, listAllBuckets } = require('../utils/aws');
+const { createClient, listAllBuckets, uploadFile } = require('../utils/aws');
 
 const awsPlugin = {
   plugin: {
@@ -8,6 +8,8 @@ const awsPlugin = {
       server.method('s3', createClient, {});
 
       server.method('buckets', listAllBuckets, {});
+
+      server.method('uploadFile', uploadFile, {});
 
       // server.method({
       //   name: 's3',

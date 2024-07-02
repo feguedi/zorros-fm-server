@@ -16,4 +16,17 @@ module.exports = [
       return listarVideos(req, h);
     },
   }),
+  route({
+    path: vidPrefix,
+    method: 'POST',
+    tags: ['video'],
+    strategies: ['token', 'session'],
+    scope: ['COACH', 'ADMINISTRADOR'],
+    description: 'Subir video',
+    payload: {
+      output: 'stream',
+      parse: true,
+      allow: 'multipart/form-data',
+    },
+  }),
 ];
