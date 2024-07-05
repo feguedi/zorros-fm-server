@@ -17,10 +17,7 @@ const VideoSchema = new Schema(
       type: String,
       required: true,
       default() {
-        const nombreCompleto = this.uri.split('/')[this.uri.split('/').length - 1];
-        const nombre = String(nombreCompleto).split(/[.](mp4|mkv|mov|avi)$/gi)[0];
-
-        return `${nombre}-thumb.jpg`;
+        return `${this.nombre}-thumb.jpg`;
       },
     },
     nota: {

@@ -19,7 +19,7 @@ exports.subirVideo = async function (req, h) {
       const filenameSplitted = String(archivo.hapi.filename).split('.');
       const extension = filenameSplitted[filenameSplitted.length - 1];
       const s3 = await req.server.methods.s3();
-      const fileUploaded = await req.server.methods.uploadFile(s3, { archivo: archivo, nombre });
+      const fileUploaded = await req.server.methods.uploadFile(s3, { archivo, nombre: `${nombre}.${extension}` });
 
       const videoNuevo = new Video({
         nombre,

@@ -11,6 +11,7 @@ const {
 const Boom = require('@hapi/boom');
 
 const errorHandler = require('./errors');
+const { streamToBuffer } = require('./buff');
 
 const minMultipartSize = 5 * 1024 * 1024; // 5MB
 
@@ -60,6 +61,31 @@ async function getObject(s3, name) {
   }
 }
 
+async function uploadFile(s3, { archivo, nombre }) {
+  try {
+    if (!s3) {
+      throw Boom.badImplementation('No existe instancia de AWS S3');
+    }
+    
+    const buff = await streamToBuffer(archivo);
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: nombre,
+      Body: buff,
+    });
+
+    const response = await s3.send(command);
+
+    return {
+      message: `Archivo ${nombre} subido`,
+      ...response,
+    };
+  } catch (error) {
+    throw errorHandler(error);
+  }
+}
+
+/*
 async function uploadFile(s3, { archivo, nombre }) {
   let uploadId;
   const chunks = [];
@@ -170,6 +196,7 @@ async function uploadFile(s3, { archivo, nombre }) {
     throw errorHandler(error);
   }
 }
+*/
 
 module.exports = {
   createClient,
