@@ -4,6 +4,9 @@ const {
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
+  CreateMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
 } = require('@aws-sdk/client-s3');
 const Boom = require('@hapi/boom');
 

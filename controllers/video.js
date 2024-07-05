@@ -13,22 +13,27 @@ async function subirMiniatura(req) {
 exports.subirVideo = async function (req, h) {
   try {
     const { id } = req.auth.credentials;
-    const { nombre, video, nota } = req.payload;
-    const filenameSplitted = String(video.hapi.filename).split('.');
-    const extension = filenameSplitted[filenameSplitted.length - 1];
-    const s3 = await req.server.methods.s3();
-    const fileUploaded = await req.server.methods.uploadFile(s3, { archivo: video, nombre });
 
-    const videoNuevo = new Video({
-      nombre,
-      uri: fileUploaded.ETag,
-      nota,
-      autor: id,
-    });
+    if (req.payload && typeof req.payload === 'object' && Object.keys(req.payload).length > 0) {
+      const { nombre, archivo, nota } = req.payload;
+      const filenameSplitted = String(archivo.hapi.filename).split('.');
+      const extension = filenameSplitted[filenameSplitted.length - 1];
+      const s3 = await req.server.methods.s3();
+      const fileUploaded = await req.server.methods.uploadFile(s3, { archivo: archivo, nombre });
 
-    await videoNuevo.save();
+      const videoNuevo = new Video({
+        nombre,
+        uri: fileUploaded.ETag,
+        nota,
+        autor: id,
+      });
 
-    return { message: `Archivo ${nombre} subido` };
+      await videoNuevo.save();
+
+      return { message: `Archivo ${nombre} subido` };
+    }
+
+    throw Boom.badRequest('No es enviaron datos correctamente');
   } catch (error) {
     throw errorHandler(error);
   }

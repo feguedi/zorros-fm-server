@@ -25,6 +25,8 @@ module.exports = [
     description: 'Subir video',
     payload: {
       output: 'stream',
+      maxBytes: 838860800,
+      multipart: true,
       parse: true,
       allow: 'multipart/form-data',
     },
