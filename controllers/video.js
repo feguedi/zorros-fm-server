@@ -42,9 +42,9 @@ exports.subirVideo = async function (req, h) {
 exports.listarVideos = async function (req, h) {
   try {
     const s3 = await req.server.methods.s3();
-    const buckets = await req.server.methods.buckets(s3);
+    const files = await req.server.methods.listFiles(s3);
 
-    return buckets;
+    return files;
   } catch (error) {
     throw errorHandler(error);
   }
