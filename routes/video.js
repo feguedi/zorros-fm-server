@@ -1,4 +1,4 @@
-const { listarVideos, subirVideo } = require('../controllers');
+const { listarVideos, subirVideo, obtenerVideo } = require('../controllers');
 const { apiPrefix } = require('../utils/constants');
 const route = require('../utils/route');
 
@@ -32,6 +32,17 @@ module.exports = [
     },
     func(req, h) {
       return subirVideo(req, h);
+    },
+  }),
+  route({
+    path: vidPrefix.concat('/{nombre}'),
+    method: 'GET',
+    tags: ['video'],
+    strategies: ['token', 'session'],
+    scope: ['COACH', 'ADMINISTRADOR'],
+    description: 'Obtener video',
+    func(req, h) {
+      return obtenerVideo(req, h);
     },
   }),
 ];

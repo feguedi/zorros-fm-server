@@ -26,6 +26,11 @@ function createClient() {
   }
 }
 
+/**
+ * Lista de buckets
+ * @param {S3Client} s3 Cliente de AWS
+ * @returns {[]}
+ */
 async function listAllBuckets(s3) {
   try {
     if (!s3) {
@@ -42,6 +47,12 @@ async function listAllBuckets(s3) {
   }
 }
 
+/**
+ * 
+ * @param {S3Client} s3 Cliente de AWS
+ * @param {String} name Nombre de archivo
+ * @returns {ReadableStream | null}
+ */
 async function getObject(s3, name) {
   try {
     if (!s3) {
@@ -52,11 +63,9 @@ async function getObject(s3, name) {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: name,
     });
-
     const response = await s3.send(command);
-    const str = await response.Body.transformToString();
 
-    return str;
+    return response.Body;
   } catch (error) {
     throw errorHandler(error);
   }
@@ -70,8 +79,6 @@ async function listAllFiles(s3) {
 
     const command = new ListObjectsCommand({ Bucket: process.env.AWS_BUCKET_NAME });
     const { Contents } = await s3.send(command);
-    const contentsList = Contents.map((c) => ` • ${c.Key}`).join("\n");
-    console.log('contentsList', contentsList);
 
     return {
       total: Contents.length,
@@ -87,6 +94,12 @@ async function listAllFiles(s3) {
   }
 }
 
+/**
+ * 
+ * @param {S3Client} s3 Cliente de AWS
+ * @param {{ archivo: Buffer; nombre: string }} Datos Nombre y archivo a subir
+ * @returns {{ message: string }} Mensaje de envío correcto de archivos
+ */
 async function uploadFile(s3, { archivo, nombre }) {
   try {
     if (!s3) {

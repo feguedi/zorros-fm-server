@@ -1,5 +1,7 @@
+const Boom = require('@hapi/boom');
 const Video = require('../models/Video');
 const errorHandler = require('../utils/errors');
+const { bufferToStream } = require('../utils/buff');
 
 async function subirMiniatura(req) {
   try {
@@ -45,6 +47,24 @@ exports.listarVideos = async function (req, h) {
     const files = await req.server.methods.listFiles(s3);
 
     return files;
+  } catch (error) {
+    throw errorHandler(error);
+  }
+};
+
+exports.obtenerVideo = async function (req, h) {
+  try {
+    const s3 = await req.server.methods.s3();
+    const { nombre } = req.params;
+    const video = await Video.findOne({ nombre });
+
+    if (!video) {
+      throw Boom.badRequest('No existe el archivo');
+    }
+
+    const object = await req.server.methods.getFile(s3, video.nombre);
+
+    return object;
   } catch (error) {
     throw errorHandler(error);
   }
