@@ -10,3 +10,7 @@ exports.crearUsuarioSchema = Joi.object({
   telefono: Joi.number().integer().min(1000000000).max(9999999999).required(),
   rol: Joi.string().valid('COACH', 'ADMINISTRADOR').default('COACH'),
 }).label('crearUsuarioSchema');
+
+exports.modificarDatosUsuarioSchema = Joi.object({
+  nombre: Joi.string().min(2).required(),
+}).label('modificarDatosUsuarioSchema');

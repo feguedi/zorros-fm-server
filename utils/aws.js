@@ -105,7 +105,7 @@ async function uploadFile(s3, { archivo, nombre }) {
     if (!s3) {
       throw Boom.badImplementation('No existe instancia de AWS S3');
     }
-    
+
     const buff = await streamToBuffer(archivo);
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
