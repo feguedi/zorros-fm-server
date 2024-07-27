@@ -3,7 +3,7 @@ const { Schema, model, SchemaTypes } = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const rolesValidos = {
-  values: ['COACH', 'ADMINISTRADOR'],
+  values: ['COACH', 'ADMINISTRADOR', 'JUGADOR'],
   message: '{VALUE} no es un rol de usuario válido',
 };
 

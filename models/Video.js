@@ -34,4 +34,4 @@ const VideoSchema = new Schema(
 
 VideoSchema.plugin(uniqueValidator, { message: '"{VALUE}" ya está registrado como {PATH}' })
 
-module.exports = model('video', VideoSchema);
+module.exports = model('Video', VideoSchema);
