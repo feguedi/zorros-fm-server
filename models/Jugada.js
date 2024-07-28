@@ -57,6 +57,11 @@ const JugadaSchema = new Schema(
       }],
       default: [],
     },
+    activa: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
   },
   {
     timestamps: true,
