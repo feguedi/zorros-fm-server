@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  zorros_fm_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zorros_fm_server
+    command: pnpm start
+    ports:
+      - 8081:8081
+    networks:
+      - reverse_proxy
+    restart: unless-stopped
+
+networks:
+  reverse_proxy:
+    external: true
