@@ -8,7 +8,7 @@ exports.failAction = function failAction(request, h, error) {
       printError(JSON.stringify(error));
       printError('==================');
     }
-
-    throw errorHandler(error);
   }
+
+  throw errorHandler(error);
 };
