@@ -1,4 +1,11 @@
-const { listarVideos, subirVideo, obtenerVideo } = require('../controllers');
+const {
+  listarVideos,
+  subirVideo,
+  obtenerVideo,
+  modificarVideo,
+  eliminarVideo,
+  habilitarVideo,
+} = require('../controllers');
 const { apiPrefix } = require('../utils/constants');
 const route = require('../utils/route');
 
@@ -43,6 +50,39 @@ module.exports = [
     description: 'Obtener video',
     func(req, h) {
       return obtenerVideo(req, h);
+    },
+  }),
+  route({
+    path: vidPrefix.concat('/{id}'),
+    method: 'PUT',
+    tags: ['video'],
+    strategies: ['token', 'session'],
+    scope: ['COACH', 'ADMINISTRADOR'],
+    description: 'Modificar datos del video',
+    func(req, h) {
+      return modificarVideo(req, h);
+    },
+  }),
+  route({
+    path: vidPrefix.concat('/{id}'),
+    method: 'PATCH',
+    tags: ['video'],
+    strategies: ['token', 'session'],
+    scope: ['ADMINISTRADOR'],
+    description: 'Habilitar video',
+    func(req, h) {
+      return habilitarVideo(req, h);
+    },
+  }),
+  route({
+    path: vidPrefix.concat('/{id}'),
+    method: 'DELETE',
+    tags: ['video'],
+    strategies: ['token', 'session'],
+    scope: ['ADMINISTRADOR'],
+    description: 'Eliminar video',
+    func(req, h) {
+      return eliminarVideo(req, h);
     },
   }),
 ];
