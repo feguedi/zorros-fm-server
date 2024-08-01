@@ -223,56 +223,132 @@ exports.obtenerListas = async function (req, h) {
     const { arbol } = req.query;
     const listaSelector = ['nombre', 'activa', 'tipo'];
     const arbolSelector = ['jugadas', 'notas', 'autor', 'createdAt', 'updatedAt'];
+    const autorSelector = ['_id', 'nombre', 'nickname', 'imagen'];
+    const jugadasSelector = ['_id', 'name', 'kind', 'sources'];
+    const sourcesSelector = ['_id', 'nombre', 'thumbnail'];
+    const project = {
+      jugadas: {
+        _id: 1,
+        name: 1,
+        kind: 1,
+        meta: 1,
+        sources: {
+          _id: 1,
+          nombre: 1,
+          thumbnail: 1,
+          uri: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+        createdAt: 1,
+        updatedAt: 1,
+      },
+      nombre: 1,
+      autor: {
+        _id: 1,
+        nickname: 1,
+        nombre: 1,
+        imagen: 1,
+      },
+      tipo: 1,
+    };
 
-    if (arbol) {
-      const listas = await Lista.find({ activa: true }, listaSelector.join(' '));
+    const projectArbol = { _id: 1 };
 
-      return listas;
-    }
-    /*
-      .populate('autor', 'nombre nickname imagen')
-      .populate('jugadas', 'name kind meta sources createdAt updatedAt')
-      .populate('jugadas.sources', 'nombre uri thumbnail nota autor createdAt updatedAt')
-      .populate('jugadas.sources.autor', 'nombre nickname imagen');
-    */
+    [...listaSelector, ...arbolSelector].forEach((s) => {
+      if (s !== 'jugadas' || s !== 'autor') {
+        projectArbol[s] = 1;
+      }
+      if (s === 'jugadas') {
+        projectArbol.jugadas = {};
+      }
+      if (s === 'autor') {
+        projectArbol.autor = {};
+      }
+    });
+
+    jugadasSelector.forEach((s) => {
+      if (s === 'sources') {
+        projectArbol.jugadas.sources = {};
+      } else {
+        projectArbol.jugadas[s] = 1;
+      }
+    });
+
+    sourcesSelector.forEach((s) => {
+      projectArbol.jugadas.sources[s] = 1;
+    });
+
+    autorSelector.forEach((s) => {
+      projectArbol.autor[s] = 1;
+    });
 
     const listas = await Lista.aggregate([
       {
-        '$lookup': {
-          'from': 'usuarios', 
-          'localField': 'autor', 
-          'foreignField': '_id', 
-          'as': 'autor'
-        }
+        $match: {
+          activa: true,
+        },
       }, {
-        '$unwind': '$autor'
+        $lookup: {
+          from: 'usuarios', 
+          localField: 'autor', 
+          foreignField: '_id', 
+          as: 'autor',
+        },
       }, {
-        '$lookup': {
-          'from': 'jugadas', 
-          'localField': 'jugadas', 
-          'foreignField': '_id', 
-          'as': 'jugadas'
-        }
+        $unwind: '$autor',
       }, {
-        '$match': {
-          'activa': true
-        }
+        $lookup: {
+          from: 'jugadas', 
+          localField: 'jugadas', 
+          foreignField: '_id', 
+          as: 'jugadas',
+        },
       }, {
-        '$project': {
-          '_id': 1, 
-          '__v': 0, 
-          'createdAt': 0, 
-          'updatedAt': 0, 
-          'activa': 0
-        }
-      }
+        $lookup: {
+          from: 'videos', 
+          localField: 'jugadas.sources', 
+          foreignField: '_id', 
+          as: 'videos',
+        },
+      }, {
+        $addFields: {
+          jugadas: {
+            $map: {
+              input: '$jugadas', 
+              as: 'jugada', 
+              in: {
+                _id: '$$jugada._id', 
+                name: '$$jugada.name', 
+                kind: '$$jugada.kind', 
+                meta: '$$jugada.meta', 
+                activa: '$$jugada.activa', 
+                sources: {
+                  $filter: {
+                    input: '$videos', 
+                    as: 'video', 
+                    cond: {
+                      $and: [
+                        { $in: ['$$video._id', '$$jugada.sources'] },
+                        { $eq: ['$$video.activo', true] }
+                      ],
+                    },
+                  },
+                }, 
+                createdAt: '$$jugada.createdAt', 
+                updatedAt: '$$jugada.updatedAt',
+              },
+            },
+          },
+        },
+      }, {
+        $project: arbol
+        ? projectArbol
+        : project,
+      },
     ]);
 
-    return listas.map((l) => ({
-      ...l,
-      jugadas: l.jugadas.map((j) => _.pick(j, ['_id', 'name', 'kind', 'meta', 'sources'])),
-      autor: _.pick(l.autor, ['_id', 'nombre', 'nickname', 'imagen']),
-    }));
+    return listas;
   } catch (error) {
     throw errorHandler(error);
   }
