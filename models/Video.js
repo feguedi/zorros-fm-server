@@ -23,6 +23,11 @@ const VideoSchema = new Schema(
       type: SchemaTypes.ObjectId,
       ref: 'Usuario',
     },
+    activo: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
   }, {
     timestamps: true,
   },
