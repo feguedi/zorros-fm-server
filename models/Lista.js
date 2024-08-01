@@ -1,5 +1,10 @@
 const { model, Schema, SchemaTypes } = require('mongoose');
 
+const TipoEnum = {
+  values: ['JUEGO', 'ENTRENAMIENTO', 'SCOUT'],
+  message: '{VALUE} no es un tipo de listo válido',
+};
+
 const ListaSchema = new Schema(
   {
     nombre: {
@@ -14,6 +19,12 @@ const ListaSchema = new Schema(
         required: true,
       }],
       default: [],
+    },
+    tipo: {
+      type: String,
+      enum: TipoEnum,
+      required: [true, 'Se requiere el tipo de lista'],
+      default: 'JUEGO',
     },
     notas: String,
     autor: {

@@ -194,7 +194,7 @@ exports.eliminarJugada = async function (req, h) {
 exports.crearLista = async function (req, h) {
   try {
     const { id: autor } = req.auth.credentials;
-    const { nombre, jugadas, notas } = req.payload;
+    const { nombre, jugadas, notas, tipo } = req.payload;
     const datos = { nombre, autor };
 
     if (Array.isArray(jugadas) && jugadas.length > 0) {
@@ -203,6 +203,9 @@ exports.crearLista = async function (req, h) {
     }
     if (notas) {
       datos.notas = notas;
+    }
+    if (tipo) {
+      datos.tipo = tipo;
     }
 
     const listaNueva = new Lista(datos);
@@ -218,7 +221,7 @@ exports.crearLista = async function (req, h) {
 exports.obtenerListas = async function (req, h) {
   try {
     const { arbol } = req.query;
-    const listaSelector = ['nombre', 'activa'];
+    const listaSelector = ['nombre', 'activa', 'tipo'];
     const arbolSelector = ['jugadas', 'notas', 'autor', 'createdAt', 'updatedAt'];
 
     if (arbol) {
