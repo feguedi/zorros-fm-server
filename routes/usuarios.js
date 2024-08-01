@@ -9,6 +9,8 @@ module.exports = [
   route({
     path: usuariosPrefix,
     method: 'POST',
+    strategies: ['session', 'token'],
+    scope: ['ADMINISTRADOR'],
     validations: {
       payload: crearUsuarioSchema,
     },
