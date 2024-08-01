@@ -1,4 +1,5 @@
 const Boom = require('@hapi/boom');
+const _ = require('underscore');
 
 const Usuario = require('../models/Usuario');
 const errorHandler = require('../utils/errors');
@@ -10,10 +11,10 @@ exports.verPerfil = async function (req) {
     const usuario = await Usuario.findOne({ _id: id, activo: true }, selector.join(' '));
 
     if (!usuario) {
-      throw Boom.badRequest('');
+      throw Boom.badRequest('Hable con el administrador');
     }
 
-    const datosPerfil = _.pick(usuario, selector).toJSON();
+    const datosPerfil = _.pick(usuario, selector);
     datosPerfil.id = id;
 
     return datosPerfil;
