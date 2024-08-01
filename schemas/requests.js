@@ -62,3 +62,14 @@ exports.modificarListaJugadasSchema = Joi.object({
 exports.arbolJugadasSchema = Joi.object({
   arbol: Joi.bool().default(false),
 }).label('arbolJugadaSchema');
+
+exports.nombreArchivoSchema = Joi.object({
+  nombre: Joi.string().required(),
+}).label('nombreArchivoSchema');
+
+exports.subirVideoConMiniaturaSchema = Joi.object({
+  // files: Joi.array().single(),
+  archivo: Joi.any().required(),
+  nombre: Joi.string(),
+  thumbnail: Joi.any(),
+}).label('subirVideoConMiniaturaSchema');

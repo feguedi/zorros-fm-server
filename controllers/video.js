@@ -18,10 +18,18 @@ function getID(obj = { id: '' }) {
   return { id };
 }
 
-async function subirMiniatura(req) {
+async function subirMiniatura(req, s3) {
   try {
     const { thumbnail } = req.payload;
-    const filenameSplitted = String(thumbnail.hapi.filename).split('.');
+    if (!thumbnail) {
+      return;
+    }
+
+    const filename = String(thumbnail.hapi.filename);
+    const s3 = await req.server.methods.s3();
+    await req.server.methods.uploadFile(s3, { archivo: thumbnail, nombre: filename });
+
+    return { message: `Miniatura ${filename} subida`, nombre: filename };
   } catch (error) {
     throw errorHandler(error);
   }
@@ -31,23 +39,35 @@ exports.subirVideo = async function (req, h) {
   try {
     const { id } = req.auth.credentials;
 
-    if (req.payload && typeof req.payload === 'object' && Object.keys(req.payload).length > 0) {
+    if (typeof req.payload === 'object' && Object.keys(req.payload).length > 0) {
       const { nombre: _nombre, archivo, nota } = req.payload;
       const filenameSplitted = String(archivo.hapi.filename).split('.');
-      const extension = filenameSplitted[filenameSplitted.length - 1];
-      const nombre = _nombre || filenameSplitted.reduce(
-        (previous, current, i) => previous.concat(i === filenameSplitted.length - 1 ? `.${current}` : ''),
-        '',
-      );
+      filenameSplitted.pop();
+      const nombre = _nombre || archivo.hapi.filename;
       const s3 = await req.server.methods.s3();
-      const fileUploaded = await req.server.methods.uploadFile(s3, { archivo, nombre: `${nombre}.${extension}` });
+      const fileUploaded = await req.server.methods.uploadFile(s3, {
+        archivo,
+        nombre,
+      });
 
       const videoNuevo = new Video({
-        nombre: `${nombre}${filenameSplitted.length > 1 ? '.'.concat(extension) : ''}`,
+        nombre,
         uri: fileUploaded.ETag,
         nota,
         autor: id,
       });
+
+      try {
+        const miniatura = await subirMiniatura(req, s3);
+
+        videoNuevo.thumbnail = miniatura.nombre;
+
+        await videoNuevo.save();
+
+        return { message: `Archivo ${nombre} subido. ${miniatura.message}` };
+      } catch (error) {
+        console.error(`Error subirMiniatura: ${error}`);
+      }
 
       await videoNuevo.save();
 
@@ -163,6 +183,24 @@ exports.eliminarVideo = async function (req, h) {
     await video.save();
 
     return { message: `Video "${video.nombre}" eliminado` };
+  } catch (error) {
+    throw errorHandler(error);
+  }
+};
+
+exports.obtenerMiniatura = async function (req, h) {
+  try {
+    const { nombre: thumbnail } = req.params;
+    const video = await Video.findOne({ thumbnail });
+
+    if (!video) {
+      throw Boom.notFound('No existe el archivo');
+    }
+
+    const s3 = await req.server.methods.s3();
+    const object = await req.server.methods.getFile(s3, thumbnail);
+
+    return object;
   } catch (error) {
     throw errorHandler(error);
   }

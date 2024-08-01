@@ -15,10 +15,6 @@ const VideoSchema = new Schema(
     },
     thumbnail: {
       type: String,
-      required: true,
-      default() {
-        return `${this.nombre}-thumb.jpg`;
-      },
     },
     nota: {
       type: String,
