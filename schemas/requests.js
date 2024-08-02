@@ -12,7 +12,7 @@ exports.loginSchema = Joi.object({
 exports.crearUsuarioSchema = Joi.object({
   nombre: Joi.string().min(3).required(),
   telefono: Joi.number().integer().min(1000000000).max(9999999999).required(),
-  rol: Joi.string().valid('COACH', 'ADMINISTRADOR').default('COACH'),
+  rol: Joi.string().valid('COACH', 'ADMINISTRADOR', 'JUGADOR').default('COACH'),
 }).label('crearUsuarioSchema');
 
 exports.modificarDatosUsuarioSchema = Joi.object({
@@ -51,6 +51,7 @@ exports.crearListaJugadasSchema = Joi.object({
   nombre: Joi.string().required(),
   jugadas: Joi.array().items(Joi.string().alphanum().min(18).max(24)),
   notas: Joi.string(),
+  tipo: Joi.string().valid('ENTRENAMIENTO', 'JUEGO', 'SCOUT'),
 }).label('crearListaJugadasSchema');
 
 exports.modificarListaJugadasSchema = Joi.object({
